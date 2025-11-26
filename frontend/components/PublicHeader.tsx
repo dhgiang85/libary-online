@@ -21,6 +21,24 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ activePage }) => {
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/books?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
+  const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch(e);
+    }
+  };
 
   return (
     <>
@@ -66,16 +84,18 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ activePage }) => {
               </nav>
             </div>
             <div className="flex flex-1 justify-center px-8">
-              <div className="w-full max-w-md">
+              <form onSubmit={handleSearch} className="w-full max-w-md">
                 <label className="relative text-gray-400 focus-within:text-gray-600 block">
                   <span className="material-symbols-outlined pointer-events-none absolute top-1/2 transform -translate-y-1/2 left-3">search</span>
-                  <input 
-                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-full text-[#0d141b] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 border-gray-300 dark:border-gray-700 bg-white/50 dark:bg-background-dark/50 h-10 placeholder:text-gray-400 dark:placeholder:text-gray-500 pl-10 text-sm font-normal leading-normal transition-all" 
-                    placeholder="Tìm kiếm sách, tác giả, thể loại..." 
-                    defaultValue=""
+                  <input
+                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-full text-[#0d141b] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 border-gray-300 dark:border-gray-700 bg-white/50 dark:bg-background-dark/50 h-10 placeholder:text-gray-400 dark:placeholder:text-gray-500 pl-10 pr-3 text-sm font-normal leading-normal transition-all"
+                    placeholder="Tìm kiếm sách, tác giả, thể loại..."
+                    value={searchQuery}
+                    onChange={handleSearchInputChange}
+                    onKeyDown={handleKeyDown}
                   />
                 </label>
-              </div>
+              </form>
             </div>
             <div className="flex items-center gap-3">
               <button className="flex h-10 w-10 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-gray-200/80 dark:bg-gray-800/80 text-[#0d141b] dark:text-gray-300 hover:bg-primary/20 dark:hover:bg-primary/30 transition-colors">

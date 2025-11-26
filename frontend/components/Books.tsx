@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { booksApi, BookFilters } from '../api/books';
+import { genresApi } from '../api/genres';
 import { PublicHeader } from './PublicHeader';
 import { PublicFooter } from './PublicFooter';
 
@@ -65,22 +66,7 @@ export const Books: React.FC = () => {
   // Fetch genres for filter dropdown
   const { data: genresData } = useQuery({
     queryKey: ['genres-list'],
-    queryFn: async () => {
-      // Assuming we have an endpoint for all genres or we paginate
-      // For now, let's try to get a list. If /genres returns paginated, we might need to handle it.
-      // Based on previous work, /genres is paginated.
-      // Let's try to fetch a large number or use a specific "all" endpoint if it exists.
-      // Checking backend: existing code used /genres/all in StepClassification.tsx.
-      // Let's use that if it exists.
-      try {
-        const response = await import('../api/axios').then(m => m.default.get('/genres/all'));
-        return response.data;
-      } catch (e) {
-        // Fallback to paginated /genres if /all doesn't exist (though it should based on previous context)
-        const response = await import('../api/axios').then(m => m.default.get('/genres?page_size=100'));
-        return response.data.items || [];
-      }
-    },
+    queryFn: () => genresApi.getAllGenres(),
   });
 
   const handleSearch = () => {
