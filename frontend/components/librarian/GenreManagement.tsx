@@ -2,14 +2,8 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
-import api from '../../api/axios';
+import { genresApi, Genre } from '../../api/genres';
 import { LibrarianSidebar } from '../LibrarianSidebar';
-
-interface Genre {
-  id: string;
-  name: string;
-  created_at: string;
-}
 
 interface GenreFormData {
   name: string;
@@ -28,17 +22,16 @@ export const GenreManagement: React.FC = () => {
   // Fetch genres
   const { data: genresData, isLoading } = useQuery({
     queryKey: ['genres', page, search],
-    queryFn: async () => {
-      const response = await api.get('/genres', {
-        params: { page, page_size: pageSize, search }
-      });
-      return response.data;
-    },
+    queryFn: () => genresApi.getGenres({
+      page,
+      page_size: pageSize,
+      search
+    }),
   });
 
   // Create mutation
   const createMutation = useMutation({
-    mutationFn: (data: GenreFormData) => api.post('/genres/', data),
+    mutationFn: (data: GenreFormData) => genresApi.createGenre(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['genres'] });
       toast.success('Thêm thể loại thành công');
@@ -51,7 +44,7 @@ export const GenreManagement: React.FC = () => {
 
   // Update mutation
   const updateMutation = useMutation({
-    mutationFn: (data: GenreFormData) => api.put(`/genres/${editingGenre!.id}`, data),
+    mutationFn: (data: GenreFormData) => genresApi.updateGenre(editingGenre!.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['genres'] });
       toast.success('Cập nhật thể loại thành công');
@@ -64,7 +57,7 @@ export const GenreManagement: React.FC = () => {
 
   // Delete mutation
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => api.delete(`/genres/${id}`),
+    mutationFn: (id: string) => genresApi.deleteGenre(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['genres'] });
       toast.success('Xóa thể loại thành công');
