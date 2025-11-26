@@ -1,0 +1,46 @@
+# FastAPI & Web Framework
+fastapi
+uvicorn[standard]
+python-multipart
+
+# Database
+sqlalchemy
+alembic
+psycopg2-binary
+asyncpg
+
+# Authentication & Security
+python-jose[cryptography]
+passlib
+bcrypt=4.3.0
+python-dotenv
+pydantic[email]
+pydantic-settings
+
+# CORS & Middleware
+fastapi-cors
+
+# File Handling
+aiofiles
+python-magic
+Pillow
+
+# Utilities
+python-slugify
+email-validator
+
+# Search
+elasticsearch>=8.0.0
+
+# Background Tasks
+apscheduler>=3.10.4
+
+# Testing
+pytest
+pytest-asyncio
+httpx==0.28.1
+
+# Development
+black
+flake8
+mypy

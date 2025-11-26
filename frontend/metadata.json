@@ -1,0 +1,5 @@
+{
+  "name": "Library Admin - Book Management",
+  "description": "A responsive library administration interface for managing book copies, specifically focusing on the 'Manage Copies' step of the book editing workflow.",
+  "requestFramePermissions": []
+}
