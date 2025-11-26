@@ -6,6 +6,7 @@ import { Footer } from './components/Footer';
 import { Home } from './components/Home';
 import { News } from './components/News';
 import { NewsDetail } from './components/NewsDetail';
+import { DashboardAnalytics } from './components/DashboardAnalytics';
 import { LibrarianDashboard } from './components/LibrarianDashboard';
 import { GenreManagement } from './components/librarian/GenreManagement';
 import { AuthorManagement } from './components/librarian/AuthorManagement';
@@ -153,7 +154,8 @@ const App: React.FC = () => {
 
       {/* Protected Routes for Librarians/Admins */}
       <Route element={<ProtectedRoute allowedRoles={['librarian', 'admin']} />}>
-        <Route path="/librarian" element={<LibrarianDashboard />} />
+        <Route path="/librarian" element={<DashboardAnalytics />} />
+        <Route path="/librarian/borrow" element={<LibrarianDashboard />} />
         <Route path="/librarian/genres" element={<GenreManagement />} />
         <Route path="/librarian/authors" element={<AuthorManagement />} />
         <Route path="/librarian/news" element={<LibrarianNews />} />

@@ -97,7 +97,7 @@ async def scheduler_status():
 
 
 # Include routers
-from app.api.v1 import auth, books, news, book_copies, upload, books_with_upload, users, reservations, reviews, search, loans, authors, cart, borrowing, genres
+from app.api.v1 import auth, books, news, book_copies, upload, books_with_upload, users, reservations, reviews, search, loans, authors, cart, borrowing, genres, dashboard
 
 app.include_router(auth.router, prefix="/api/v1")
 app.include_router(books.router, prefix="/api/v1")
@@ -114,6 +114,7 @@ app.include_router(authors.router, prefix="/api/v1")
 app.include_router(cart.router, prefix="/api/v1")
 app.include_router(borrowing.router, prefix="/api/v1")
 app.include_router(genres.router, prefix="/api/v1")
+app.include_router(dashboard.router, prefix="/api/v1")
 
 # Mount static files for uploaded content
 uploads_dir = Path(settings.UPLOAD_DIR)
