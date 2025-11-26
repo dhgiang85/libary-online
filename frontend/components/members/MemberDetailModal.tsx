@@ -13,6 +13,7 @@ interface MemberDetailModalProps {
 export const MemberDetailModal: React.FC<MemberDetailModalProps> = ({ userId, isOpen, onClose }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState<'info' | 'history'>('info');
+  const [roleChangeModal, setRoleChangeModal] = useState<{ isOpen: boolean; newRole: 'user' | 'librarian' | 'admin' | null }>({ isOpen: false, newRole: null });
   const queryClient = useQueryClient();
 
   // Fetch user detail
@@ -80,9 +81,27 @@ export const MemberDetailModal: React.FC<MemberDetailModalProps> = ({ userId, is
   };
 
   const handleRoleChange = (newRole: 'user' | 'librarian' | 'admin') => {
-    if (window.confirm(`Bạn có chắc chắn muốn thay đổi vai trò thành "${newRole}"?`)) {
-      updateRoleMutation.mutate({ role: newRole });
+    setRoleChangeModal({ isOpen: true, newRole });
+  };
+
+  const confirmRoleChange = () => {
+    if (roleChangeModal.newRole) {
+      updateRoleMutation.mutate({ role: roleChangeModal.newRole });
+      setRoleChangeModal({ isOpen: false, newRole: null });
     }
+  };
+
+  const cancelRoleChange = () => {
+    setRoleChangeModal({ isOpen: false, newRole: null });
+  };
+
+  const getRoleLabel = (role: 'user' | 'librarian' | 'admin') => {
+    const labels = {
+      admin: 'Quản trị viên',
+      librarian: 'Thủ thư',
+      user: 'Thành viên'
+    };
+    return labels[role];
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -346,6 +365,55 @@ export const MemberDetailModal: React.FC<MemberDetailModalProps> = ({ userId, is
           </div>
         )}
       </div>
+
+      {/* Role Change Confirmation Modal */}
+      {roleChangeModal.isOpen && roleChangeModal.newRole && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                <span className="material-symbols-outlined text-blue-600 dark:text-blue-400 text-2xl">swap_horiz</span>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  Xác nhận thay đổi vai trò
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                  Bạn có chắc chắn muốn thay đổi vai trò của <span className="font-medium text-gray-900 dark:text-white">{user?.full_name || user?.username}</span> thành:
+                </p>
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                  <p className="text-lg font-bold text-blue-700 dark:text-blue-300 text-center">
+                    {getRoleLabel(roleChangeModal.newRole)}
+                  </p>
+                </div>
+                <p className="text-xs text-amber-600 dark:text-amber-400 mt-3 flex items-start gap-1">
+                  <span className="material-symbols-outlined text-sm mt-0.5">info</span>
+                  <span>Thay đổi vai trò sẽ ảnh hưởng đến quyền hạn truy cập của thành viên này.</span>
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <button
+                onClick={cancelRoleChange}
+                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+              >
+                Hủy bỏ
+              </button>
+              <button
+                onClick={confirmRoleChange}
+                disabled={updateRoleMutation.isPending}
+                className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {updateRoleMutation.isPending && (
+                  <span className="material-symbols-outlined animate-spin text-sm">progress_activity</span>
+                )}
+                {updateRoleMutation.isPending ? 'Đang xử lý...' : 'Xác nhận'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

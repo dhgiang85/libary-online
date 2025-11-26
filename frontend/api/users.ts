@@ -59,6 +59,11 @@ export const usersApi = {
     await api.delete(`/users/${userId}`);
   },
 
+  activateUser: async (userId: string) => {
+    const response = await api.put(`/users/${userId}/activate`);
+    return response.data;
+  },
+
   updateUserRole: async (userId: string, data: RoleUpdateData) => {
     const response = await api.put<User>(`/users/${userId}/role`, data);
     return response.data;

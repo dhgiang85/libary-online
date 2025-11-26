@@ -229,8 +229,38 @@ async def deactivate_user(
     # Deactivate user
     user.is_active = False
     await db.commit()
-    
+
     return None
+
+
+@router.put("/{user_id}/activate", status_code=status.HTTP_200_OK)
+async def activate_user(
+    user_id: UUID,
+    current_user: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    """Activate (restore) user (admin only)"""
+    # Get user
+    result = await db.execute(select(User).where(User.id == user_id))
+    user = result.scalar_one_or_none()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+
+    if user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User is already active"
+        )
+
+    # Activate user
+    user.is_active = True
+    await db.commit()
+
+    return {"message": "User activated successfully"}
 
 
 @router.put("/{user_id}/role", response_model=UserResponse)

@@ -50,6 +50,18 @@ export const LibrarianMembers: React.FC = () => {
     }
   });
 
+  // Activate mutation
+  const activateMutation = useMutation({
+    mutationFn: usersApi.activateUser,
+    onSuccess: () => {
+      toast.success('Đã kích hoạt lại thành viên');
+      queryClient.invalidateQueries({ queryKey: ['members'] });
+    },
+    onError: (error: any) => {
+      toast.error('Lỗi: ' + (error.response?.data?.detail || error.message));
+    }
+  });
+
   const handleViewDetail = (userId: string) => {
     setSelectedUserId(userId);
     setIsDetailModalOpen(true);
@@ -271,13 +283,22 @@ export const LibrarianMembers: React.FC = () => {
                                 >
                                   <span className="material-symbols-outlined text-xl">visibility</span>
                                 </button>
-                                {member.is_active && (
+                                {member.is_active ? (
                                   <button
                                     className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 transition-colors"
                                     onClick={() => handleDeactivateClick(member.id, member.username, member.full_name || member.username)}
                                     title="Vô hiệu hóa"
                                   >
                                     <span className="material-symbols-outlined text-xl">block</span>
+                                  </button>
+                                ) : (
+                                  <button
+                                    className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 transition-colors"
+                                    onClick={() => activateMutation.mutate(member.id)}
+                                    title="Kích hoạt lại"
+                                    disabled={activateMutation.isPending}
+                                  >
+                                    <span className="material-symbols-outlined text-xl">check_circle</span>
                                   </button>
                                 )}
                               </div>
