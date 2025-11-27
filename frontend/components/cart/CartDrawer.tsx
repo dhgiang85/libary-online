@@ -19,6 +19,18 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose, onCheck
     }
   }, [isOpen, fetchCart]);
 
+  const getImageUrl = (url: string | null | undefined) => {
+    if (!url) return 'https://via.placeholder.com/300x400?text=No+Cover';
+    if (url.startsWith('http')) return url;
+
+    // Get base URL from env or default
+    const apiUrl = (import.meta as any).env.VITE_API_URL || 'http://localhost:8000/api/v1';
+    // Remove /api/v1 suffix to get root URL
+    const baseUrl = apiUrl.replace('/api/v1', '');
+
+    return `${baseUrl}${url}`;
+  };
+
   const handleRemove = async (bookId: string) => {
     try {
       await removeFromCart(bookId);
@@ -86,17 +98,14 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose, onCheck
                     }}
                   >
                     {/* Book Cover */}
-                    {item.book?.cover_url ? (
-                      <img
-                        src={item.book.cover_url}
-                        alt={item.book.title || 'Book cover'}
-                        className="w-16 h-20 object-cover rounded-md shadow-sm flex-shrink-0"
-                      />
-                    ) : (
-                      <div className="w-16 h-20 bg-gray-200 dark:bg-gray-700 rounded-md flex items-center justify-center flex-shrink-0">
-                        <span className="material-symbols-outlined text-2xl text-gray-400">book</span>
-                      </div>
-                    )}
+                    <img
+                      src={getImageUrl(item.book?.cover_url)}
+                      alt={item.book?.title || 'Book cover'}
+                      className="w-16 h-20 object-cover rounded-md shadow-sm flex-shrink-0"
+                      onError={(e) => {
+                        e.currentTarget.src = 'https://via.placeholder.com/300x400?text=No+Cover';
+                      }}
+                    />
 
                     {/* Book Info */}
                     <div className="flex-1 min-w-0">

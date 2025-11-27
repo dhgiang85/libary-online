@@ -68,6 +68,18 @@ export const MyReservations: React.FC = () => {
     }
   };
 
+  const getImageUrl = (url: string | null | undefined) => {
+    if (!url) return 'https://via.placeholder.com/300x400?text=No+Cover';
+    if (url.startsWith('http')) return url;
+
+    // Get base URL from env or default
+    const apiUrl = (import.meta as any).env.VITE_API_URL || 'http://localhost:8000/api/v1';
+    // Remove /api/v1 suffix to get root URL
+    const baseUrl = apiUrl.replace('/api/v1', '');
+
+    return `${baseUrl}${url}`;
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'PENDING':
@@ -202,18 +214,15 @@ export const MyReservations: React.FC = () => {
                     <div className="flex gap-6">
                       {/* Book Cover */}
                       <div className="flex-shrink-0">
-                        {reservation.book?.cover_url ? (
-                          <img
-                            src={reservation.book.cover_url}
-                            alt={reservation.book.title}
-                            className="w-24 h-32 object-cover rounded-lg shadow-sm cursor-pointer hover:opacity-80 transition-opacity"
-                            onClick={() => navigate(`/books/${reservation.book_id}`)}
-                          />
-                        ) : (
-                          <div className="w-24 h-32 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
-                            <span className="material-symbols-outlined text-4xl text-gray-400">book</span>
-                          </div>
-                        )}
+                        <img
+                          src={getImageUrl(reservation.book?.cover_url)}
+                          alt={reservation.book?.title || 'Book cover'}
+                          className="w-24 h-32 object-cover rounded-lg shadow-sm cursor-pointer hover:opacity-80 transition-opacity"
+                          onClick={() => navigate(`/books/${reservation.book_id}`)}
+                          onError={(e) => {
+                            e.currentTarget.src = 'https://via.placeholder.com/300x400?text=No+Cover';
+                          }}
+                        />
                       </div>
 
                       {/* Reservation Details */}
