@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuthStore } from '../../store/authStore';
-import { LogOut, User as UserIcon, BookOpen, Settings } from 'lucide-react';
+import { LogOut, User as UserIcon, BookOpen, Settings, Bookmark } from 'lucide-react';
 
 import { useNavigate } from 'react-router-dom';
 
@@ -51,7 +51,7 @@ export const UserMenu: React.FC = () => {
               <UserIcon size={16} />
               Hồ sơ cá nhân
             </button>
-            <button 
+            <button
               onClick={() => {
                 navigate('/profile/history');
                 setIsOpen(false);
@@ -60,6 +60,16 @@ export const UserMenu: React.FC = () => {
             >
               <BookOpen size={16} />
               Lịch sử mượn sách
+            </button>
+            <button
+              onClick={() => {
+                navigate('/profile/reservations');
+                setIsOpen(false);
+              }}
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
+            >
+              <Bookmark size={16} />
+              Sách đặt trước
             </button>
             {user.role === 'admin' && (
               <button className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2">

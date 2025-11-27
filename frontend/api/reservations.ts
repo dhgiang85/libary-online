@@ -1,18 +1,35 @@
-import api from './axios';
-import { Reservation } from '../types/models';
+import api from "./axios";
+import { Reservation, PaginatedResponse } from "../types/models";
+
+export interface ReservationFilters {
+  page?: number;
+  page_size?: number;
+  status_filter?: "PENDING" | "FULFILLED" | "CANCELLED" | "EXPIRED";
+}
 
 export const reservationsApi = {
-  createReservation: async (bookId: string) => {
-    const response = await api.post<Reservation>('/reservations', { book_id: bookId });
+  /**
+   * Create a new reservation for a book
+   */
+  createReservation: async (bookId: string): Promise<Reservation> => {
+    const response = await api.post<Reservation>("/reservations", { book_id: bookId });
     return response.data;
   },
-  
-  getMyReservations: async () => {
-    const response = await api.get<Reservation[]>('/reservations');
+
+  /**
+   * Get current user's reservations with pagination
+   */
+  getMyReservations: async (filters: ReservationFilters = {}): Promise<PaginatedResponse<Reservation>> => {
+    const response = await api.get<PaginatedResponse<Reservation>>("/reservations", {
+      params: filters
+    });
     return response.data;
   },
-  
-  cancelReservation: async (id: string) => {
+
+  /**
+   * Cancel a reservation
+   */
+  cancelReservation: async (id: string): Promise<void> => {
     await api.delete(`/reservations/${id}`);
   }
 };

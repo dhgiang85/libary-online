@@ -29,6 +29,7 @@ import { AuthorDetail } from './components/AuthorDetail';
 import { CartPage } from './components/cart/CartPage';
 import { CheckoutConfirmation } from './components/cart/CheckoutConfirmation';
 import { BorrowHistoryPage } from './components/profile/BorrowHistoryPage';
+import { MyReservations } from './components/profile/MyReservations';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { BookCopy, CopyStatus, BookStats, PublicationDetails, ClassificationDetails, BasicInfo } from './types';
 
@@ -150,6 +151,7 @@ const App: React.FC = () => {
       <Route element={<ProtectedRoute />}>
         <Route path="/cart/checkout" element={<CheckoutConfirmation />} />
         <Route path="/profile/history" element={<BorrowHistoryPage />} />
+        <Route path="/profile/reservations" element={<MyReservations />} />
       </Route>
 
       {/* Protected Routes for Librarians/Admins */}
