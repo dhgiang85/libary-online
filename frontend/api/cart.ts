@@ -1,11 +1,12 @@
-import api from './axios';
+import api from "./axios";
+import { Book } from "../types/models";
 
 export interface CartItem {
   id: string;
   cart_id: string;
   book_id: string;
   added_at: string;
-  book?: any; // Will be populated with book details
+  book?: Book; // Will be populated with book details
 }
 
 export interface Cart {
@@ -36,7 +37,7 @@ export const cartApi = {
    * Get current user's cart
    */
   getCart: async (): Promise<Cart> => {
-    const response = await api.get<Cart>('/cart');
+    const response = await api.get<Cart>("/cart");
     return response.data;
   },
 
@@ -44,7 +45,7 @@ export const cartApi = {
    * Add a book to cart
    */
   addToCart: async (bookId: string): Promise<CartItem> => {
-    const response = await api.post<CartItem>('/cart/items', {
+    const response = await api.post<CartItem>("/cart/items", {
       book_id: bookId
     });
     return response.data;
@@ -61,7 +62,7 @@ export const cartApi = {
    * Clear all items from cart
    */
   clearCart: async (): Promise<void> => {
-    await api.delete('/cart/clear');
+    await api.delete("/cart/clear");
   },
 
   /**
@@ -72,7 +73,7 @@ export const cartApi = {
     if (dueDate) {
       data.due_date = dueDate.toISOString();
     }
-    const response = await api.post<CheckoutResponse>('/cart/checkout', data);
+    const response = await api.post<CheckoutResponse>("/cart/checkout", data);
     return response.data;
   }
 };

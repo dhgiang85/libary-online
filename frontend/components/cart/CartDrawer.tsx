@@ -77,19 +77,65 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose, onCheck
                 {cart.items.map((item) => (
                   <div
                     key={item.id}
-                    className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                    className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors cursor-pointer group"
+                    onClick={() => {
+                      if (item.book?.id) {
+                        navigate(`/books/${item.book.id}`);
+                        onClose();
+                      }
+                    }}
                   >
+                    {/* Book Cover */}
+                    {item.book?.cover_url ? (
+                      <img
+                        src={item.book.cover_url}
+                        alt={item.book.title || 'Book cover'}
+                        className="w-16 h-20 object-cover rounded-md shadow-sm flex-shrink-0"
+                      />
+                    ) : (
+                      <div className="w-16 h-20 bg-gray-200 dark:bg-gray-700 rounded-md flex items-center justify-center flex-shrink-0">
+                        <span className="material-symbols-outlined text-2xl text-gray-400">book</span>
+                      </div>
+                    )}
+
+                    {/* Book Info */}
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-gray-900 dark:text-white truncate">
-                        Book ID: {item.book_id}
-                      </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Đã thêm: {new Date(item.added_at).toLocaleDateString('vi-VN')}
-                      </p>
+                      <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-2 mb-1">
+                        {item.book?.title || `Book ID: ${item.book_id}`}
+                      </h3>
+                      {item.book?.authors && item.book.authors.length > 0 && (
+                        <p className="text-sm text-gray-600 dark:text-gray-400 truncate mb-1">
+                          {item.book.authors.map((a: any) => a.name).join(', ')}
+                        </p>
+                      )}
+                      <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                        <span className="material-symbols-outlined text-[14px]">schedule</span>
+                        <span>{new Date(item.added_at).toLocaleDateString('vi-VN')}</span>
+                      </div>
+                      {item.book?.available_copies !== undefined && (
+                        <div className="mt-1">
+                          {item.book.available_copies > 0 ? (
+                            <span className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
+                              <span className="material-symbols-outlined text-[14px]">check_circle</span>
+                              {item.book.available_copies} bản sẵn sàng
+                            </span>
+                          ) : (
+                            <span className="text-xs text-red-600 dark:text-red-400 flex items-center gap-1">
+                              <span className="material-symbols-outlined text-[14px]">error</span>
+                              Hết sách
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
+
+                    {/* Remove Button */}
                     <button
-                      onClick={() => handleRemove(item.book_id)}
-                      className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemove(item.book_id);
+                      }}
+                      className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
                       title="Xóa khỏi giỏ"
                     >
                       <Trash2 className="h-4 w-4" />
