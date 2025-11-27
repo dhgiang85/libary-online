@@ -62,6 +62,7 @@ export const BookDetail: React.FC = () => {
     onSuccess: () => {
       toast.success('Đặt trước sách thành công!');
       queryClient.invalidateQueries({ queryKey: ['books', bookId] });
+      queryClient.invalidateQueries({ queryKey: ['my-reservations'] });
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.detail || 'Đặt trước thất bại');
@@ -75,9 +76,20 @@ export const BookDetail: React.FC = () => {
     enabled: isAuthenticated,
   });
 
+  // Fetch user's reservations to check if already reserved
+  const { data: reservationsData } = useQuery({
+    queryKey: ['my-reservations'],
+    queryFn: () => reservationsApi.getMyReservations({ status_filter: 'PENDING' }),
+    enabled: isAuthenticated,
+  });
+
   const isBorrowed = borrowHistory?.some(
-    record => record.book_title === book?.title && 
+    record => record.book_title === book?.title &&
     (record.status === BorrowStatus.ACTIVE || record.status === BorrowStatus.PENDING)
+  );
+
+  const hasActiveReservation = reservationsData?.items?.some(
+    reservation => reservation.book_id === bookId && reservation.status === 'PENDING'
   );
 
   const handleAddToCart = async () => {
@@ -243,11 +255,11 @@ export const BookDetail: React.FC = () => {
                   {(book.available_copies ?? 0) === 0 && (
                     <button
                       onClick={handleReserve}
-                      disabled={!isAuthenticated || reserveMutation.isPending}
+                      disabled={!isAuthenticated || reserveMutation.isPending || hasActiveReservation}
                       className="flex-1 sm:flex-none h-10 px-6 rounded-lg border-2 border-amber-500 text-amber-600 dark:text-amber-400 font-semibold hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <span className="material-symbols-outlined text-[20px]">bookmark_add</span>
-                      {reserveMutation.isPending ? 'Đang xử lý...' : 'Đặt trước'}
+                      {hasActiveReservation ? 'Đã đặt trước' : reserveMutation.isPending ? 'Đang xử lý...' : 'Đặt trước'}
                     </button>
                   )}
 

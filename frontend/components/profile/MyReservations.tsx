@@ -36,9 +36,10 @@ export const MyReservations: React.FC = () => {
       const reservationsWithBookData = await Promise.all(
         reservationsData.items.map(async (reservation) => {
           try {
-            const book = await booksApi.getBookById(reservation.book_id);
+            const book = await booksApi.getBook(reservation.book_id);
             return { ...reservation, book };
           } catch (error) {
+            console.error('Error fetching book:', error);
             return { ...reservation, book: null };
           }
         })
