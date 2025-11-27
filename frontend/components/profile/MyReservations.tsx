@@ -63,9 +63,44 @@ export const MyReservations: React.FC = () => {
   });
 
   const handleCancelReservation = (id: string, bookTitle: string) => {
-    if (window.confirm(`Bạn có chắc chắn muốn hủy đặt trước sách "${bookTitle}"?`)) {
-      cancelMutation.mutate(id);
-    }
+    toast((t) => (
+      <div className="flex flex-col gap-2">
+        <p className="font-medium text-gray-900 dark:text-white">
+          Bạn có chắc muốn hủy đặt trước sách <span className="font-bold">"{bookTitle}"</span>?
+        </p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          Bạn sẽ mất vị trí ưu tiên trong hàng đợi đặt trước.
+        </p>
+        <div className="flex gap-2 justify-end mt-1">
+          <button
+            className="px-3 py-1.5 text-sm font-medium bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 transition-colors"
+            onClick={() => toast.dismiss(t.id)}
+          >
+            Hủy
+          </button>
+          <button
+            className="px-3 py-1.5 text-sm font-medium bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+            onClick={() => {
+              cancelMutation.mutate(id);
+              toast.dismiss(t.id);
+            }}
+          >
+            Xác nhận hủy đặt trước
+          </button>
+        </div>
+      </div>
+    ), {
+      duration: 5000,
+      position: 'top-center',
+      style: {
+        background: '#fff',
+        color: '#333',
+        padding: '16px',
+        borderRadius: '8px',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+      },
+      className: 'dark:bg-gray-800 dark:text-white dark:border dark:border-gray-700',
+    });
   };
 
   const getImageUrl = (url: string | null | undefined) => {
