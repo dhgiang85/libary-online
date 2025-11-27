@@ -9,6 +9,7 @@ export interface BookFilters {
   genre?: string;
   authors?: string;
   min_rating?: number;
+  only_available?: boolean;
 }
 
 export interface CreateBookRequest {

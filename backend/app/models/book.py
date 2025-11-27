@@ -65,7 +65,7 @@ class Book(Base):
     keywords = relationship('Keyword', secondary=book_keywords, back_populates='books')
     copies = relationship('BookCopy', back_populates='book', cascade='all, delete-orphan')
     creator = relationship('User', back_populates='created_books', foreign_keys=[created_by])
-    reservations = relationship('Reservation', back_populates='book')
+    reservations = relationship('Reservation', back_populates='book', cascade='all, delete-orphan')
     reviews = relationship('Review', back_populates='book', cascade='all, delete-orphan')
     
     def __repr__(self):

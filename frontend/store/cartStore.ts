@@ -92,9 +92,29 @@ export const useCartStore = create<CartState>((set, get) => ({
         borrow_records: result.borrow_records 
       };
     } catch (error: any) {
-      const message = error.response?.data?.detail?.message || 
-                     error.response?.data?.detail || 
-                     'Checkout failed';
+      // Extract error message properly
+      let message = 'Checkout failed';
+      
+      if (error.response?.data?.detail) {
+        const detail = error.response.data.detail;
+        
+        // Handle object with message field
+        if (typeof detail === 'object' && detail.message) {
+          message = detail.message;
+          // Optionally include failed books info
+          if (detail.failed_books && detail.failed_books.length > 0) {
+            const failedTitles = detail.failed_books
+              .map((fb: any) => fb.book_title)
+              .join(', ');
+            message += `: ${failedTitles}`;
+          }
+        }
+        // Handle string detail
+        else if (typeof detail === 'string') {
+          message = detail;
+        }
+      }
+      
       set({ error: message, isLoading: false });
       return { success: false, message };
     }

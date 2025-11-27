@@ -14,7 +14,7 @@ class Reservation(Base):
     
     id = Column(GUID(), primary_key=True, default=uuid.uuid4)
     user_id = Column(GUID(), ForeignKey('users.id'), nullable=False)
-    book_id = Column(GUID(), ForeignKey('books.id'), nullable=False)
+    book_id = Column(GUID(), ForeignKey('books.id', ondelete='CASCADE'), nullable=False)
     status = Column(String(20), default='PENDING')  # PENDING, FULFILLED, CANCELLED, EXPIRED
     reserved_at = Column(DateTime, default=datetime.utcnow)
     expires_at = Column(DateTime, nullable=False)

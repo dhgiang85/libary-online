@@ -14,7 +14,9 @@
       "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmMTE0ZTU1MS00Yzg3LTQyYjItOTRmOS1mOWRjOTU0ZmI1OTciLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3NjQxNDQ1OTIsImlhdCI6MTc2NDE0MzY5MiwidHlwZSI6ImFjY2VzcyJ9.1QlumLeH2ew_HdLoHCyudfVXiwo60LuzflyyElR6eKs\")",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(cat:*)",
+      "Bash(echo:*)"
     ],
     "deny": [],
     "ask": []

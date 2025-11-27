@@ -61,6 +61,8 @@ async def get_books(
     search: Optional[str] = None,
     genre: Optional[str] = None,
     author: Optional[str] = None,
+    only_available: Optional[bool] = None,
+    min_rating: Optional[float] = Query(None, ge=0, le=5),
     sort: Optional[str] = Query(None, description="Sort by: rating_desc, created_at_desc, title_asc"),
     db: AsyncSession = Depends(get_db)
 ):
@@ -72,6 +74,8 @@ async def get_books(
     - **search**: Search in title, description, ISBN
     - **genre**: Filter by genre name
     - **author**: Filter by author name
+    - **only_available**: Filter to show only books with available copies
+    - **min_rating**: Filter to show only books with rating >= this value
     - **sort**: Sort order (rating_desc, created_at_desc, title_asc)
     """
     # Base query
@@ -96,6 +100,14 @@ async def get_books(
     
     if author:
         query = query.join(Book.authors).where(Author.name == author)
+    
+    if only_available:
+        # Filter books that have at least one available copy
+        from app.models.book_copy import CopyStatus
+        query = query.join(Book.copies).where(BookCopy.status == CopyStatus.AVAILABLE).distinct()
+    
+    if min_rating is not None:
+        query = query.where(Book.average_rating >= min_rating)
     
     # Apply sorting
     if sort == "rating_desc":

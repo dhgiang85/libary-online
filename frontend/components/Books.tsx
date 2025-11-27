@@ -53,6 +53,7 @@ export const Books: React.FC = () => {
     page_size: pageSize,
     search: searchQuery || undefined,
     min_rating: minRating > 0 ? minRating : undefined,
+    only_available: onlyAvailable || undefined,
     genre: selectedGenre || undefined,
     authors: selectedAuthor || undefined,
     sort: sortBy || undefined,

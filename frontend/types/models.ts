@@ -69,9 +69,11 @@ export interface BookCopy {
 }
 
 export enum BorrowStatus {
+  PENDING = 'PENDING',
   ACTIVE = 'ACTIVE',
   RETURNED = 'RETURNED',
-  OVERDUE = 'OVERDUE'
+  OVERDUE = 'OVERDUE',
+  CANCELLED = 'CANCELLED'
 }
 
 export interface BorrowRecord {

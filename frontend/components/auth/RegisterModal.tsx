@@ -10,7 +10,11 @@ import { authApi } from '../../api/auth';
 const registerSchema = z.object({
   email: z.string().email('Email không hợp lệ'),
   username: z.string().min(3, 'Tên đăng nhập phải có ít nhất 3 ký tự'),
-  password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
+  password: z.string()
+    .min(8, 'Mật khẩu phải có ít nhất 8 ký tự')
+    .regex(/[A-Z]/, 'Mật khẩu phải có ít nhất 1 chữ HOA')
+    .regex(/[a-z]/, 'Mật khẩu phải có ít nhất 1 chữ thường')
+    .regex(/[0-9]/, 'Mật khẩu phải có ít nhất 1 chữ số'),
   full_name: z.string().optional(),
   confirm_password: z.string()
 }).refine((data) => data.password === data.confirm_password, {
@@ -45,7 +49,26 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, o
       onSwitchToLogin();
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.detail || 'Đăng ký thất bại');
+      // Extract detailed error message from backend response
+      let errorMessage = 'Đăng ký thất bại';
+      
+      if (error.response?.data?.detail) {
+        const detail = error.response.data.detail;
+        
+        // Handle validation errors (array format)
+        if (Array.isArray(detail)) {
+          errorMessage = detail.map((err: any) => {
+            const field = err.loc?.[1] || 'field';
+            return `${field}: ${err.msg}`;
+          }).join(', ');
+        } 
+        // Handle string error messages
+        else if (typeof detail === 'string') {
+          errorMessage = detail;
+        }
+      }
+      
+      toast.error(errorMessage);
     },
   });
 
@@ -106,11 +129,14 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, o
             {...register('password')}
             type="password"
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            placeholder="Ít nhất 6 ký tự"
+            placeholder="Ít nhất 8 ký tự (A-z, 0-9)"
           />
           {errors.password && (
             <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
           )}
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ HOA, chữ thường và số
+          </p>
         </div>
 
         <div>

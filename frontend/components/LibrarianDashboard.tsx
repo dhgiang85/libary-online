@@ -3,12 +3,16 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
+import toast from 'react-hot-toast';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { LibrarianSidebar } from './LibrarianSidebar';
 import { loansApi } from '../api/loans';
+import { borrowingApi } from '../api/borrowing';
 import { BorrowStatus } from '../types/models';
 
 export const LibrarianDashboard: React.FC = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>(''); // '' for all
@@ -30,6 +34,31 @@ export const LibrarianDashboard: React.FC = () => {
     }),
   });
 
+  // Mutations
+  const confirmPickupMutation = useMutation({
+    mutationFn: borrowingApi.confirmPickup,
+    onSuccess: () => {
+      toast.success('Đã xác nhận lấy sách');
+      queryClient.invalidateQueries({ queryKey: ['loans'] });
+      queryClient.invalidateQueries({ queryKey: ['borrowing'] });
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.detail || 'Lỗi khi xác nhận');
+    }
+  });
+
+  const returnBookMutation = useMutation({
+    mutationFn: borrowingApi.returnBook,
+    onSuccess: () => {
+      toast.success('Đã trả sách thành công');
+      queryClient.invalidateQueries({ queryKey: ['loans'] });
+      queryClient.invalidateQueries({ queryKey: ['borrowing'] });
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.detail || 'Lỗi khi trả sách');
+    }
+  });
+
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
     setPage(1);
@@ -48,6 +77,10 @@ export const LibrarianDashboard: React.FC = () => {
     
     if (status === 'ACTIVE') {
       return <span className="inline-flex items-center text-xs font-medium px-2.5 py-0.5 rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">Đang mượn</span>;
+    }
+
+    if (status === 'PENDING') {
+      return <span className="inline-flex items-center text-xs font-medium px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">Chờ lấy sách</span>;
     }
     
     return <span className="inline-flex items-center text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">{status}</span>;
@@ -123,6 +156,12 @@ export const LibrarianDashboard: React.FC = () => {
                     <p className="text-sm font-medium leading-normal">Tất cả</p>
                   </button>
                   <button 
+                    className={`flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg px-4 transition-colors ${statusFilter === 'PENDING' ? 'bg-primary/10 dark:bg-primary/20 text-primary' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                    onClick={() => setStatusFilter('PENDING')}
+                  >
+                    <p className="text-sm font-medium leading-normal">Chờ lấy sách</p>
+                  </button>
+                  <button 
                     className={`flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg px-4 transition-colors ${statusFilter === 'ACTIVE' ? 'bg-primary/10 dark:bg-primary/20 text-primary' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
                     onClick={() => setStatusFilter('ACTIVE')}
                   >
@@ -180,9 +219,24 @@ export const LibrarianDashboard: React.FC = () => {
                             {getStatusBadge(loan.status, loan.due_date)}
                           </td>
                           <td className="px-6 py-4 text-right">
-                            <button className="text-slate-500 dark:text-slate-400 hover:text-primary p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">
-                              <span className="material-symbols-outlined">more_horiz</span>
-                            </button>
+                            <div className="flex gap-2 justify-end">
+                              {loan.status === 'PENDING' && (
+                                <button
+                                  onClick={() => confirmPickupMutation.mutate(loan.id)}
+                                  className="text-white bg-green-600 hover:bg-green-700 px-3 py-1 rounded text-xs font-medium transition-colors"
+                                >
+                                  Xác nhận lấy
+                                </button>
+                              )}
+                              {(loan.status === 'ACTIVE' || loan.status === 'OVERDUE') && (
+                                <button
+                                  onClick={() => returnBookMutation.mutate(loan.id)}
+                                  className="text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-xs font-medium transition-colors"
+                                >
+                                  Trả sách
+                                </button>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       ))
