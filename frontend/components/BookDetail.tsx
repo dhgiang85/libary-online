@@ -227,22 +227,44 @@ export const BookDetail: React.FC = () => {
                 </div>
 
                 <div className="flex flex-wrap gap-3 mt-auto pt-2">
-                  <button 
-                    onClick={handleAddToCart}
-                    disabled={hasBook(bookId!) || isBorrowed}
-                    className="flex-1 sm:flex-none h-10 px-6 rounded-lg bg-primary text-white font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <span className="material-symbols-outlined text-[20px]">add_shopping_cart</span>
-                    {isBorrowed ? 'Đang mượn' : hasBook(bookId!) ? 'Đã trong giỏ' : 'Thêm vào giỏ'}
-                  </button>
-                  
-                  <button 
-                    onClick={handleReserve}
-                    className="flex-1 sm:flex-none h-10 px-6 rounded-lg border border-primary text-primary font-semibold hover:bg-primary/5 transition-colors flex items-center justify-center gap-2"
-                  >
-                    <span className="material-symbols-outlined text-[20px]">bookmark_add</span>
-                    Đặt trước
-                  </button>
+                  {/* Show Add to Cart button only when available_copies > 0 */}
+                  {(book.available_copies ?? 0) > 0 && (
+                    <button
+                      onClick={handleAddToCart}
+                      disabled={hasBook(bookId!) || isBorrowed}
+                      className="flex-1 sm:flex-none h-10 px-6 rounded-lg bg-primary text-white font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <span className="material-symbols-outlined text-[20px]">add_shopping_cart</span>
+                      {isBorrowed ? 'Đang mượn' : hasBook(bookId!) ? 'Đã trong giỏ' : 'Thêm vào giỏ'}
+                    </button>
+                  )}
+
+                  {/* Show Reserve button only when available_copies = 0 */}
+                  {(book.available_copies ?? 0) === 0 && (
+                    <button
+                      onClick={handleReserve}
+                      disabled={!isAuthenticated || reserveMutation.isPending}
+                      className="flex-1 sm:flex-none h-10 px-6 rounded-lg border-2 border-amber-500 text-amber-600 dark:text-amber-400 font-semibold hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <span className="material-symbols-outlined text-[20px]">bookmark_add</span>
+                      {reserveMutation.isPending ? 'Đang xử lý...' : 'Đặt trước'}
+                    </button>
+                  )}
+
+                  {/* Show availability info */}
+                  <div className="w-full flex items-center gap-2 text-sm">
+                    {(book.available_copies ?? 0) > 0 ? (
+                      <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                        <span className="material-symbols-outlined text-[18px]">check_circle</span>
+                        <span>{book.available_copies} bản sao sẵn sàng</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400">
+                        <span className="material-symbols-outlined text-[18px]">info</span>
+                        <span>Tất cả bản sao đang được mượn. Bạn có thể đặt trước để được ưu tiên khi sách trả về.</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
