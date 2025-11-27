@@ -328,10 +328,10 @@ export const Books: React.FC = () => {
                           className={`inline-block px-2 py-0.5 text-xs font-semibold rounded-full w-fit whitespace-nowrap ${
                             isAvailable
                               ? 'text-green-800 bg-green-100 dark:bg-green-900/30 dark:text-green-300'
-                              : 'text-red-800 bg-red-100 dark:bg-red-900/30 dark:text-red-300'
+                              : 'text-amber-800 bg-amber-100 dark:bg-amber-900/30 dark:text-amber-300'
                           }`}
                         >
-                          {isAvailable ? 'Có sẵn' : 'Đã mượn'}
+                          {isAvailable ? 'Có sẵn' : 'Hết sách'}
                         </span>
                       </div>
                       <p className="text-sm text-slate-500 dark:text-slate-400">
